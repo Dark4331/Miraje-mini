@@ -1,0 +1,24 @@
+# Build artifacts & local state — keep the image lean.
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+data/
+*.db
+*.sqlite*
+.git/
+.gitignore
+.gitattributes
+README.md
+LICENSE
+Dockerfile
+docker-compose.yml
+.dockerignore
+.github/
+.vscode/
+.idea/
+*.md
+!requirements.txt

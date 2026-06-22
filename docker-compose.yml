@@ -1,0 +1,37 @@
+# Miraje — self-hosted agentic LLM client
+# Usage:  docker compose up -d --build
+# Then open http://localhost:8000
+#
+# To pick up code changes without rebuilding, the app/ and static/ directories
+# are mounted as volumes. Uvicorn's --reload flag watches for file changes and
+# restarts the server automatically.
+
+services:
+  miraje:
+    build: .
+    image: miraje:mini
+    container_name: miraje
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      # All your data — chats, sessions, settings, personas — lives here. Back it up.
+      - ./data:/app/data
+      # Mount source code so changes are picked up live (no rebuild needed).
+      - ./app:/app/app
+      - ./static:/app/static
+      # Mount .env for configuration (optional).
+      - ./.env:/app/.env:ro
+    environment:
+      # --- Provider defaults (override in .env or via the in-app Settings panel) ---
+      MIRAJE_PROVIDER: ${MIRAJE_PROVIDER:-openai-compatible}
+      MIRAJE_BASE_URL: ${MIRAJE_BASE_URL:-http://host.docker.internal:11434/v1}
+      MIRAJE_API_KEY: ${MIRAJE_API_KEY:-ollama}
+      MIRAJE_MODEL: ${MIRAJE_MODEL:-llama3.1}
+      MIRAJE_OLLAMA_URL: ${MIRAJE_OLLAMA_URL:-http://host.docker.internal:11434}
+      MIRAJE_AGENT_MAX_STEPS: ${MIRAJE_AGENT_MAX_STEPS:-12}
+    extra_hosts:
+      # Lets the container reach an Ollama / LM Studio running on your host.
+      - "host.docker.internal:host-gateway"
+    # Override the CMD to add --reload for live code updates.
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/app/app", "--reload-dir", "/app/static"]

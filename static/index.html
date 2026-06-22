@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <title>Miraje — mini</title>
+  <meta name="description" content="A self-hosted, privacy-first agentic LLM client. Just you and your models." />
+  <link rel="icon" type="image/svg+xml" href="/static/logo.svg" />
+  <link rel="apple-touch-icon" href="/static/logo.svg" />
+  <link rel="stylesheet" href="/static/css/style.css?v=8" />
+</head>
+<body>
+  <div class="app">
+    <!-- ============ Sidebar ============ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img src="/static/logo.svg" alt="Miraje logo" class="brand-logo" />
+        <div class="brand-text">
+          <span class="brand-name">Miraje</span>
+          <span class="brand-variant">mini</span>
+        </div>
+      </div>
+
+      <div class="sidebar-actions">
+        <button class="btn btn-primary btn-block" id="newChatBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          New chat
+        </button>
+        <button class="btn btn-ghost btn-block" id="newAgentBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4v1a3 3 0 0 1 3 3v3a8 8 0 0 1-16 0v-3a3 3 0 0 1 3-3V6a4 4 0 0 1 4-4z"/><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/></svg>
+          New agent task
+        </button>
+        <button class="btn btn-ghost btn-block btn-sm" id="searchBtn">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          Search conversations
+          <span class="kbd-hint">⌘F</span>
+        </button>
+        <button class="btn btn-ghost btn-block btn-sm" id="starredBtn" title="Starred messages">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Starred messages
+        </button>
+        <button class="btn btn-ghost btn-block btn-sm" id="importBtn" title="Import a .md or .json file">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          Import file
+        </button>
+        <input type="file" id="importFileInput" accept=".md,.json,.txt" style="display:none" />
+      </div>
+
+      <div class="tag-filter" id="tagFilter"></div>
+
+      <div class="recent-section" id="recentSection" style="display:none">
+        <button class="recent-header" id="recentToggle" aria-expanded="true">
+          <svg class="recent-chev" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          <span>Recent</span>
+        </button>
+        <div class="recent-list" id="recentList"></div>
+      </div>
+
+      <div class="sessions" id="sessionsList">
+        <div class="sessions-empty">No conversations yet.</div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost btn-block btn-sm" id="settingsBtn">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+          <span class="kbd-hint">⌘,</span>
+        </button>
+        <button class="btn btn-ghost btn-block btn-sm" id="cmdPaletteBtn">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          Command palette
+          <span class="kbd-hint">⌘K</span>
+        </button>
+        <button class="btn btn-ghost btn-block btn-sm" id="backupBtn" title="Download every conversation as a zip">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Backup all (.zip)
+        </button>
+        <button class="btn btn-ghost btn-block btn-sm" id="statsBtn" title="Usage statistics">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M18 17V9M13 17V5M8 17v-3"/></svg>
+          Stats
+        </button>
+        <div class="privacy-badge" title="No telemetry. All data stays on your host.">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Local · No telemetry
+        </div>
+      </div>
+    </aside>
+
+    <!-- ============ Main ============ -->
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn mobile-only" id="menuBtn" aria-label="Toggle sidebar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div class="topbar-title">
+          <h1 id="sessionTitle">Miraje</h1>
+          <span class="mode-badge" id="modeBadge">chat</span>
+        </div>
+        <div class="topbar-right">
+          <label class="select-wrap">
+            <select id="modelSelect" title="Model"></select>
+          </label>
+          <button class="icon-btn" id="refreshModelsBtn" title="Refresh models" aria-label="Refresh models">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="messages" id="messages">
+        <!-- Welcome state injected by JS -->
+      </section>
+
+      <footer class="composer">
+        <div class="composer-inner">
+          <div class="composer-tools" id="composerTools"></div>
+          <div class="drop-zone" id="dropZone" style="display:none">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <span>Drop files here to upload</span>
+          </div>
+          <div class="file-attachments" id="fileAttachments"></div>
+          <div class="composer-row">
+            <textarea id="composerInput" class="composer-input" rows="1"
+              placeholder="Message Miraje…  (Enter to send, Shift+Enter for newline)"></textarea>
+            <button class="btn btn-danger btn-stop" id="stopBtn" aria-label="Stop generating" title="Stop" style="display:none">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+            </button>
+            <button class="btn btn-primary btn-send" id="sendBtn" disabled aria-label="Send">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            </button>
+          </div>
+          <div class="composer-hint" id="composerHint">
+            <span id="composerHintText">Streaming · responses are generated by the model you configure.</span>
+            <span class="context-counter" id="contextCounter" title="Number of messages in the conversation context"></span>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ============ Settings Modal ============ -->
+  <div class="modal-overlay" id="settingsModal" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Settings</h2>
+        <button class="icon-btn" id="closeSettings" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="setProvider">Provider</label>
+          <select id="setProvider">
+            <option value="openai-compatible">OpenAI-compatible (OpenAI, OpenRouter, LM Studio, vLLM, Ollama /v1…)</option>
+            <option value="ollama">Ollama (native /api/chat)</option>
+          </select>
+          <p class="field-hint">Choose how Miraje talks to models.</p>
+        </div>
+
+        <div class="field" id="fieldBaseUrl">
+          <label for="setBaseUrl">Base URL</label>
+          <input id="setBaseUrl" type="text" placeholder="http://localhost:11434/v1" />
+          <p class="field-hint">Any OpenAI-compatible endpoint. Local examples: LM Studio (1234), Ollama (11434/v1), llama.cpp (8080/v1).</p>
+        </div>
+
+        <div class="field" id="fieldApiKey">
+          <label for="setApiKey">API Key</label>
+          <input id="setApiKey" type="password" placeholder="sk-… (leave as-is to keep)" />
+          <p class="field-hint">Stored only in your local Miraje database. Use any dummy value for local servers.</p>
+        </div>
+
+        <div class="field" id="fieldOllamaUrl">
+          <label for="setOllamaUrl">Ollama URL</label>
+          <input id="setOllamaUrl" type="text" placeholder="http://localhost:11434" />
+        </div>
+
+        <div class="field">
+          <label for="setModel">Default model</label>
+          <input id="setModel" type="text" placeholder="llama3.1" />
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="setAgentSteps">Agent max steps</label>
+            <input id="setAgentSteps" type="number" min="1" max="40" value="12" />
+          </div>
+          <div class="field">
+            <label for="setAgentTemp">Agent temperature</label>
+            <input id="setAgentTemp" type="number" min="0" max="2" step="0.1" value="0.2" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="setCustomSystemPrompt">Custom system prompt <span style="color:var(--text-dim);font-weight:400">(optional, global)</span></label>
+          <textarea id="setCustomSystemPrompt" rows="3" placeholder="Used when no persona is selected. Leave blank for none."></textarea>
+          <p class="field-hint">Applied to every chat that doesn't pick a persona or send an explicit system prompt.</p>
+        </div>
+
+        <div class="field field-checkbox">
+          <label class="checkbox-row">
+            <input type="checkbox" id="setShowReasoning" />
+            <span>Show model reasoning</span>
+          </label>
+          <p class="field-hint">When the model emits <code>&lt;think&gt;</code> blocks, stream them as collapsible reasoning panels above the answer.</p>
+        </div>
+
+        <div class="field">
+          <label for="setActivePersona">Active persona</label>
+          <select id="setActivePersona">
+            <option value="default">Default</option>
+          </select>
+          <p class="field-hint">Used for any new chat that doesn't pick a persona explicitly. Manage personas below.</p>
+        </div>
+
+        <div class="field">
+          <label>Personas</label>
+          <div class="persona-mgr-list" id="personaManagerList"></div>
+          <button class="btn btn-ghost btn-sm" id="addPersonaBtn" type="button" style="margin-top:8px;align-self:flex-start">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            New custom persona
+          </button>
+        </div>
+
+        <div class="compat-hint">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+          <span>Agent compatibility: tool-calling requires an OpenAI-compatible endpoint (OpenAI, OpenRouter, LM Studio, vLLM, Ollama <code>/v1</code>). Native Ollama (<code>/api/chat</code>) answers without tools.</span>
+        </div>
+
+        <div class="settings-note">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Privacy-first: no analytics, no telemetry, no cloud sync. Everything stays in <code>data/miraje.db</code> on this host.</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="settingsCancel">Cancel</button>
+        <button class="btn btn-primary" id="settingsSave">Save settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Persona Editor Modal ============ -->
+  <div class="modal-overlay" id="personaEditorModal" hidden>
+    <div class="modal" style="max-width:560px">
+      <div class="modal-head">
+        <h2 id="personaEditorTitle">New persona</h2>
+        <button class="icon-btn" id="closePersonaEditor" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="personaEditId" />
+        <div class="field">
+          <label for="personaEditName">Name</label>
+          <input id="personaEditName" type="text" placeholder="e.g. Code reviewer" />
+        </div>
+        <div class="field">
+          <label for="personaEditSystem">System prompt</label>
+          <textarea id="personaEditSystem" rows="6" placeholder="You are a meticulous code reviewer…"></textarea>
+          <p class="field-hint">Sent to the model as the system message at the start of every chat using this persona.</p>
+        </div>
+        <div class="field">
+          <label for="personaEditMemory">Memory <span style="color:var(--text-dim);font-weight:400">(optional, accumulated notes)</span></label>
+          <textarea id="personaEditMemory" rows="4" placeholder="Facts, preferences, or context the persona should remember across chats."></textarea>
+          <p class="field-hint">Appended to the system prompt under a <code>Memory:</code> header. Edit anytime.</p>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="personaEditorCancel">Cancel</button>
+        <button class="btn btn-primary" id="personaEditorSave">Save persona</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Toast ============ -->
+  <div class="toast" id="toast" hidden></div>
+
+  <!-- ============ Command Palette ============ -->
+  <div class="modal-overlay" id="cmdPalette" hidden>
+    <div class="cmd-palette">
+      <div class="cmd-input-wrap">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input id="cmdInput" class="cmd-input" type="text" placeholder="Type a command or search…" autocomplete="off" />
+        <kbd class="cmd-esc">esc</kbd>
+      </div>
+      <div class="cmd-list" id="cmdList"></div>
+      <div class="cmd-foot">
+        <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+        <span><kbd>↵</kbd> run</span>
+        <span><kbd>esc</kbd> close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Stats Modal ============ -->
+  <div class="modal-overlay" id="statsModal" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Usage stats</h2>
+        <button class="icon-btn" id="closeStats" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="statsBody">
+        <div class="stats-loading">Loading…</div>
+      </div>
+      <div class="modal-foot">
+        <span class="stats-note">Local only · computed on demand · no telemetry</span>
+        <button class="btn btn-ghost" id="statsClose">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Search Modal ============ -->
+  <div class="modal-overlay" id="searchModal" hidden>
+    <div class="modal" style="max-width:560px">
+      <div class="modal-head">
+        <h2>Search conversations</h2>
+        <button class="icon-btn" id="closeSearch" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="search-input-wrap">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input id="searchInput" class="search-input" type="text" placeholder="Search across all your conversations…" autocomplete="off" />
+        </div>
+        <div class="search-results" id="searchResults">
+          <div class="search-hint">Type to search. Matches message content across every session.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Starred Modal ============ -->
+  <div class="modal-overlay" id="starredModal" hidden>
+    <div class="modal" style="max-width:560px">
+      <div class="modal-head">
+        <h2>Starred messages</h2>
+        <button class="icon-btn" id="closeStarred" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="search-results" id="starredResults">
+          <div class="search-hint">Loading…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/markdown.js?v=8"></script>
+  <script src="/static/js/app.js?v=8"></script>
+</body>
+</html>
