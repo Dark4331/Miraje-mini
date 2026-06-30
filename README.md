@@ -84,23 +84,6 @@ host, use `host.docker.internal` (already wired up in `docker-compose.yml`):
 
 ---
 
-## 🛠️ Run without Docker
-
-Prefer bare metal? Three commands:
-
-```bash
-git clone https://github.com/Dark4331/Miraje-mini.git
-cd Miraje-mini
-pip install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
-If you're talking to a local Ollama, the defaults already work — just make sure
-Ollama is running on `localhost:11434`.
-
-> Requires **Python 3.11+** (3.12 recommended).
-
----
 
 ## ⚙️ Configuration
 
